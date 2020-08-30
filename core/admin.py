@@ -8,4 +8,4 @@ class EventoAdmin(admin.ModelAdmin):
     list_filter = ('titulo','usuario','data_evento')
 
 
-admin.site.register(Evento,EventoAdmin)
+admin.site.register(Evento, EventoAdmin)
