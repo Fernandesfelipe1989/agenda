@@ -1,19 +1,45 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 # Create your views here.
 from core.models import Evento
 
 
-def consultaevento(resquest, titulo_evento ):
+def consultaevento(resquest, titulo_evento):
     descricao = Evento.objects.get(titulo=titulo_evento)
     return HttpResponse('<h1>O local do evento será: {}</h1>'.format(descricao.local))
 
 
+def login_user(request):
+    return render(request, 'login.html')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('/')
+
+
+def submit_login(request):
+    if request.POST:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        usuario = authenticate(username=username, password=password)
+        if usuario is not None:
+            login(request, usuario)
+
+        else:
+            messages.error(request, "Usuário ou senha inválido")
+    return redirect('/')
+
+
+@login_required(login_url='/login/')
 def lista_eventos(request):
+    usuario = request.user
     # usuario = request.user
     # evento = Evento.objects.filter(usuario=usuario)
-    evento = Evento.objects.all()
+    evento = Evento.objects.filter(usuario=usuario)
     dados = {'eventos': evento}
     return render(request, 'agenda.html', dados)
 # def index(request):
